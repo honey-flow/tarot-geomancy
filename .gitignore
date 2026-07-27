@@ -1,0 +1,30 @@
+# Godot 4+ engine cache and generated data
+.godot/
+/android/
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.userprefs
+.mono/
+
+# Exports — adjust to match your export path
+/builds/
+/exports/
+*.exe
+*.pck
+*.apk
+*.aab
+*.dmg
+*.zip
+
+# IDE
+.vs/
+.idea/
+*.suo
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
