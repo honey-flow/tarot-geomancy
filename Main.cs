@@ -1,61 +1,153 @@
 using Godot;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public partial class Main : Control
 {
 	private Button _attackButton;
-	private Label _playerHPLabel;
-	private Label _enemyHPLabel;
+	private Button _restartButton;
+	private CheckBox _debugToggle;
+	private LineEdit _seedField;
+	private Label _seedLabel;
 	private Label _battleStateLabel;
 
+	private readonly Random _seedGenerator = new Random();
+
 	private BattleControl _battle;
-	private Combatant _player;
-	private Combatant _enemy;
+	private Combatant _pendingPlayerUnit;
+
+	private Dictionary<int, Label> _combatantRows = new Dictionary<int, Label>();
+	private Dictionary<int, VBoxContainer> _teamRows = new Dictionary<int, VBoxContainer>();
 
 	public override void _Ready()
 	{
 		_attackButton = GetNode<Button>("AttackButton");
-		_playerHPLabel = GetNode<Label>("PlayerHPLabel");
-		_enemyHPLabel = GetNode<Label>("EnemyHPLabel");
+		_restartButton = GetNode<Button>("RestartButton");
+		_debugToggle = GetNode<CheckBox>("DebugToggle");
+		_seedField = GetNode<LineEdit>("SeedField");
+		_seedLabel = GetNode<Label>("SeedLabel");
+		_teamRows[BattleControl.PlayerTeam] = GetNode<VBoxContainer>("PlayerRows");
+		_teamRows[BattleControl.EnemyTeam] = GetNode<VBoxContainer>("EnemyRows");
 		_battleStateLabel = GetNode<Label>("BattleStateLabel");
 
 		_attackButton.Pressed += OnAttackPressed;
+		_restartButton.Pressed += OnRestartPressed;
+		_debugToggle.Toggled += OnDebugToggled;
 
-		StartBattle();
+		_seedField.Visible = _debugToggle.ButtonPressed;
+
+		OnRestartPressed();
 	}
 
-	private void StartBattle()
+	private void StartBattle(int seed)
 	{
-		_battle = new BattleControl(seed: 12345);
+		if (_battle != null) _battle.LogEmitted -= OnBattleLog;
+
+		_pendingPlayerUnit = null;
+
+
+		_battle = new BattleControl(seed);
 		_battle.LogEmitted += OnBattleLog;
 
-		_player = _battle.AddCombatant("Player", BattleControl.PlayerTeam, maxHP: 100, atk: 15, spd: 35);
-		_enemy = _battle.AddCombatant("Enemy", BattleControl.EnemyTeam, maxHP: 100, atk: 15, spd: 30);
+		_seedLabel.Text = $"Seed: {seed}";
+		GD.Print($"=== New battle, seed: {seed} ===");
+
+		_battle.AddCombatant("PlayerA", BattleControl.PlayerTeam, maxHP: 100, atk: 15, spd: 35).Controller = ControlSource.Player;
+		_battle.AddCombatant("PlayerB", BattleControl.PlayerTeam, maxHP: 100, atk: 15, spd: 35).Controller = ControlSource.Player;
+	  _battle.AddCombatant("EnemyA", BattleControl.EnemyTeam, maxHP: 100, atk: 15, spd: 30);
+		_battle.AddCombatant("EnemyB", BattleControl.EnemyTeam, maxHP: 100, atk: 15, spd: 40);
+
 
 		_battle.StartRound();
+		BuildCombatantRows();
 		RefreshUI();
+		RequestNextDeclaration();
+	}
+
+	private void BuildCombatantRows()
+	{
+		_combatantRows.Clear();
+		foreach (var container in _teamRows.Values)
+		{
+			foreach(var child in container.GetChildren())
+			{
+				child.QueueFree();
+			}
+		}
+
+		foreach (var c in _battle.Combatants)
+		{
+			if(!_teamRows.TryGetValue(c.TeamId, out var container)) continue;
+		
+			var row = new Label();
+			row.Name= $"{c.Id}_{c.Name}";
+			
+			container.AddChild(row);
+
+			_combatantRows[c.Id] = row;
+		}
 	}
 
 	private void OnAttackPressed()
 	{
-		if (_battle.Phase == BattlePhase.Finished) return;
-
+		if (_pendingPlayerUnit == null) return;
 		//Player Declares Attack and Target
-		var target = _battle.LivingEnemiesOf(_player).FirstOrDefault();
+		var target = _battle.LivingEnemiesOf(_pendingPlayerUnit).FirstOrDefault();
 		if (target == null) return;
-		_battle.Declare(BattleAction.Attack(_player, target));
+		_battle.Declare(BattleAction.Attack(_pendingPlayerUnit, target));
 
-		//Enemy Team Declares
-		_battle.DeclareForTeam(BattleControl.EnemyTeam);
+		_pendingPlayerUnit = null;
 
-		//Resolve Attack Sequence
+		RequestNextDeclaration();
+	}
+
+	private void OnRestartPressed()
+	{
+		StartBattle(ResolveSeed());
+	}
+
+	private int ResolveSeed()
+	{
+		if (_debugToggle.ButtonPressed && int.TryParse(_seedField.Text, out int typed))
+		return typed;
+		return _seedGenerator.Next();
+	}
+
+	private void OnDebugToggled(bool pressed)
+	{
+		_seedField.Visible = pressed;
+	}
+
+	public void RequestNextDeclaration()
+  {
+    if (_battle.Phase == BattlePhase.Finished) return;
+    var unit = _battle.AwaitingDeclaration.FirstOrDefault();
+		if (unit == null){
+			RunResolution();
+			return;
+		} 
+		if (unit.Controller != ControlSource.Player)
+    {
+      _battle.Declare(_battle.GetAIAction(unit));
+			RequestNextDeclaration();
+			return;
+    }
+		
+		_pendingPlayerUnit = unit;
+		RefreshUI();
+  }
+
+	public void RunResolution()
+	{
+		if (_battle.Phase != BattlePhase.Declaration) return;
 		_battle.BeginResolution();
-		_battle.ReturnEntireRound();
-
-		//Move to Next Turn
+		_battle.ResolveEntireRound();
 		if (_battle.Phase != BattlePhase.Finished)
-			  _battle.StartRound();
-
+		{
+			_battle.StartRound();
+			RequestNextDeclaration();
+		}
 		RefreshUI();
 	}
 
@@ -66,8 +158,14 @@ public partial class Main : Control
 
 	private void RefreshUI()
 	{
-		_playerHPLabel.Text = $"{_player.Name}: {_player.CurrentHP}/{_player.MaxHP}";
-		_enemyHPLabel.Text = $"{_enemy.Name}: {_enemy.CurrentHP}/{_enemy.MaxHP}";
+		foreach (var c in _battle.Combatants)
+		{
+			if (!_combatantRows.TryGetValue(c.Id, out var row)) continue;
+
+			row.Text = $"{c.Name}   HP: {c.CurrentHP}/{c.MaxHP}";
+			row.Modulate = c.IsAlive ? Colors.White : new Color(0.4f, 0.4f, 0.4f);
+			if (c == _pendingPlayerUnit) row.Text += "  <";
+		}
 
 		if (_battle.Phase == BattlePhase.Finished)
 		{
@@ -79,6 +177,7 @@ public partial class Main : Control
 		else
 		{
 			_battleStateLabel.Text = $"Round {_battle.RoundNumber}";
+			_attackButton.Disabled = false;
 		}
 	}
 }

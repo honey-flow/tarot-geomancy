@@ -135,7 +135,7 @@ public class BattleControl
     return true;
   }
 
-  public void ReturnEntireRound()
+  public void ResolveEntireRound()
   {
     while (ResolveNextAction()) {}
   }

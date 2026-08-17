@@ -1,5 +1,11 @@
 using System;
 
+public enum ControlSource
+{
+  AI,
+  Player
+}
+
 public class Combatant
 {
   public int Id {get;}
@@ -14,6 +20,7 @@ public class Combatant
 
   public bool IsAlive => CurrentHP > 0;
   public bool CanAct => IsAlive && !IsStunned;
+  public ControlSource Controller {get;set;} = ControlSource.AI;
 
   public Combatant(int id, string name, int teamId, int maxHp, int atk, int spd)
   {
