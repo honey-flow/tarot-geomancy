@@ -53,10 +53,10 @@ public partial class Main : Control
 		_seedLabel.Text = $"Seed: {seed}";
 		GD.Print($"=== New battle, seed: {seed} ===");
 
-		_battle.AddCombatant("PlayerA", BattleControl.PlayerTeam, maxHP: 100, atk: 15, spd: 35).Controller = ControlSource.Player;
-		_battle.AddCombatant("PlayerB", BattleControl.PlayerTeam, maxHP: 100, atk: 15, spd: 35).Controller = ControlSource.Player;
-	  _battle.AddCombatant("EnemyA", BattleControl.EnemyTeam, maxHP: 100, atk: 15, spd: 30);
-		_battle.AddCombatant("EnemyB", BattleControl.EnemyTeam, maxHP: 100, atk: 15, spd: 40);
+		_battle.AddCombatant("Populus", BattleControl.PlayerTeam, maxHP: 80, atk: 80, mag: 80, def: 80, spd: 80, eva: 0).Controller = ControlSource.Player;
+		_battle.AddCombatant("Fortuna Minor", BattleControl.PlayerTeam, maxHP: 80, atk: 120, mag: 100, def: 80, spd: 120, eva: 0).Controller = ControlSource.Player;
+	  _battle.AddCombatant("Leatitia", BattleControl.EnemyTeam, maxHP: 80, atk: 120, mag: 80, def: 80, spd: 100, eva: 0);
+		_battle.AddCombatant("Rubues", BattleControl.EnemyTeam, maxHP: 80, atk: 80, mag: 100, def: 80, spd: 100, eva: 0);
 
 
 		_battle.StartRound();

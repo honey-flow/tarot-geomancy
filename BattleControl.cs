@@ -38,9 +38,9 @@ public class BattleControl
   // Setup
   //============================
 
-  public Combatant AddCombatant(string name, int teamId, int maxHP, int atk, int spd)
+  public Combatant AddCombatant(string name, int teamId, int maxHP, int atk, int mag, int def, int spd, int eva)
   {
-    var c = new Combatant(_nextId++, name, teamId, maxHP, atk, spd);
+    var c = new Combatant(_nextId++, name, teamId, maxHP, atk, mag,def, spd, eva);
     Combatants.Add(c);
     return c;
   }
