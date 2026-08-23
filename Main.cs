@@ -62,7 +62,7 @@ public partial class Main : Control
 
 		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player);
 		AddFigure("Fortuna Minor", BattleControl.PlayerTeam, ControlSource.Player);
-		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI);
+		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI).Riders.Add(Suit.Wands);
 		AddFigure("Rubeus", BattleControl.EnemyTeam, ControlSource.AI);
 
 
