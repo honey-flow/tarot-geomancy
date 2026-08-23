@@ -63,7 +63,7 @@ public static class DamageCalculator
     return damage * 100.0 / (100.0 + res);
   }
 
-  //----- Step 7: Resove -----//
+  //----- Step 7: Resolve -----//
   public static int Resolve(Combatant attacker, Combatant target, Move move, bool isCrit, bool ignoresDefense)
   {
     double baseDamage = BaseDamage(attacker, move);

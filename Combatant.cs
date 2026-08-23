@@ -1,28 +1,26 @@
 using System;
 using System.Collections.Generic;
 
-public enum ControlSource
-{
-  AI,
-  Player
-}
-
 public class Combatant
 {
   public int Id {get;}
   public string Name {get;}
-  public int TeamId {get;set;}
-
+  public int TeamId {get;}
+  public int MaxHP {get;}
+  public int CurrentHP {get;private set;}
+  public int BaseAtk {get;}
+  public int Atk => BaseAtk;
+  public int BaseMag {get;}
+  public int Mag => BaseMag;
+  public int BaseDef {get;}
+  public int Def => BaseDef;
+  public int BaseSpd {get;}
+  public int Spd  => BaseSpd;
+  public int BaseEva {get;}
+  public int Eva => BaseEva;
+  
   public HashSet<Suit> Riders {get;} = new HashSet<Suit>();
   public bool HasRider(Suit suit) => Riders.Contains(suit);
-
-  public int MaxHP {get;set;}
-  public int CurrentHP {get;private set;}
-  public int Atk {get;set;}
-  public int Mag {get;set;}
-  public int Def {get;set;}
-  public int Spd {get;set;}
-  public int Eva {get;set;}
 
   public bool IsStunned {get;set;}
 
@@ -39,11 +37,11 @@ public class Combatant
       TeamId = teamId;
       MaxHP = maxHp;
       CurrentHP = maxHp;
-      Atk = atk;
-      Mag = mag;
-      Def = def;
-      Spd = spd;
-      Eva = eva;
+      BaseAtk = atk;
+      BaseMag = mag;
+      BaseDef = def;
+      BaseSpd = spd;
+      BaseEva = eva;
   }
 
   public int TakeDamage(int amount)

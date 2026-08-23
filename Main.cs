@@ -17,11 +17,11 @@ public partial class Main : Control
 	private BattleControl _battle;
 	private Combatant _pendingPlayerUnit;
 
-	private Dictionary<int, Label> _combatantRows = new Dictionary<int, Label>();
-	private Dictionary<int, VBoxContainer> _teamRows = new Dictionary<int, VBoxContainer>();
+	private readonly Dictionary<int, Label> _combatantRows = new Dictionary<int, Label>();
+	private readonly Dictionary<int, VBoxContainer> _teamRows = new Dictionary<int, VBoxContainer>();
 
 	public override void _Ready()
-	{
+	{ 
 		_attackButton = GetNode<Button>("AttackButton");
 		_restartButton = GetNode<Button>("RestartButton");
 		_debugToggle = GetNode<CheckBox>("DebugToggle");
@@ -38,6 +38,13 @@ public partial class Main : Control
 		_seedField.Visible = _debugToggle.ButtonPressed;
 
 		OnRestartPressed();
+
+		/**foreach (var (name, lines) in roster)
+		{
+			var f = new GeomanticFigure(name, lines, quality, suit);
+			GD.Print($"{f}  HP {f.MaxHP}  ATK {f.Atk}  MAG {f.Mag}  DEF {f.Def}  SPD {f.Spd}");	
+		}
+**/
 	}
 
 	private void StartBattle(int seed)
@@ -53,10 +60,10 @@ public partial class Main : Control
 		_seedLabel.Text = $"Seed: {seed}";
 		GD.Print($"=== New battle, seed: {seed} ===");
 
-		_battle.AddCombatant("Populus", BattleControl.PlayerTeam, maxHP: 80, atk: 80, mag: 80, def: 80, spd: 80, eva: 0).Controller = ControlSource.Player;
-		_battle.AddCombatant("Fortuna Minor", BattleControl.PlayerTeam, maxHP: 80, atk: 120, mag: 100, def: 80, spd: 120, eva: 0).Controller = ControlSource.Player;
-	  _battle.AddCombatant("Leatitia", BattleControl.EnemyTeam, maxHP: 80, atk: 120, mag: 80, def: 80, spd: 100, eva: 0);
-		_battle.AddCombatant("Rubues", BattleControl.EnemyTeam, maxHP: 80, atk: 80, mag: 100, def: 80, spd: 100, eva: 0);
+		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player);
+		AddFigure("Fortuna Minor", BattleControl.PlayerTeam, ControlSource.Player);
+		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI);
+		AddFigure("Rubeus", BattleControl.EnemyTeam, ControlSource.AI);
 
 
 		_battle.StartRound();
@@ -72,6 +79,7 @@ public partial class Main : Control
 		{
 			foreach(var child in container.GetChildren())
 			{
+				container.RemoveChild(child);
 				child.QueueFree();
 			}
 		}
@@ -87,6 +95,24 @@ public partial class Main : Control
 
 			_combatantRows[c.Id] = row;
 		}
+	}
+
+	private Combatant AddFigure(string figureName, int teamId, ControlSource controller)
+	{
+		var figure = FigureRoster.Get(figureName);
+
+		var combatant = _battle.AddCombatant(
+			figure.Name,
+			teamId,
+			maxHP: figure.MaxHP,
+			atk: figure.Atk,
+			mag: figure.Mag,
+			def: figure.Def,
+			spd: figure.Spd,
+			eva: 0);
+
+		combatant.Controller = controller;
+		return combatant;
 	}
 
 	private void OnAttackPressed()
@@ -110,7 +136,7 @@ public partial class Main : Control
 	private int ResolveSeed()
 	{
 		if (_debugToggle.ButtonPressed && int.TryParse(_seedField.Text, out int typed))
-		return typed;
+			return typed;
 		return _seedGenerator.Next();
 	}
 
@@ -120,23 +146,24 @@ public partial class Main : Control
 	}
 
 	public void RequestNextDeclaration()
-  {
-    if (_battle.Phase == BattlePhase.Finished) return;
-    var unit = _battle.AwaitingDeclaration.FirstOrDefault();
-		if (unit == null){
+	{
+		if (_battle.Phase == BattlePhase.Finished) return;
+		var unit = _battle.AwaitingDeclaration.FirstOrDefault();
+		if (unit == null)
+		{
 			RunResolution();
 			return;
-		} 
+		}
 		if (unit.Controller != ControlSource.Player)
-    {
-      _battle.Declare(_battle.GetAIAction(unit));
+		{
+			_battle.Declare(_battle.GetAIAction(unit));
 			RequestNextDeclaration();
 			return;
-    }
-		
+		}
+
 		_pendingPlayerUnit = unit;
 		RefreshUI();
-  }
+	}
 
 	public void RunResolution()
 	{
