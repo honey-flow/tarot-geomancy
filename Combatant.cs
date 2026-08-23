@@ -27,6 +27,7 @@ public class Combatant
   public bool IsAlive => CurrentHP > 0;
   public bool CanAct => IsAlive && !IsStunned;
   public ControlSource Controller {get;set;} = ControlSource.AI;
+  public Suit Element {get;set;} = Suit.None;
 
   private readonly Dictionary<Suit, int> _resistance = new Dictionary<Suit, int>();
 

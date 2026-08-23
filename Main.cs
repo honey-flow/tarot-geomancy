@@ -105,6 +105,7 @@ public partial class Main : Control
 			eva: 0);
 
 		combatant.Controller = controller;
+		combatant.Element = figure.RulingElement;
 		return combatant;
 	}
 

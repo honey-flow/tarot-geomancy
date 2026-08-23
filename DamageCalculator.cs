@@ -70,7 +70,8 @@ public static class DamageCalculator
     double mitigated = AfterDefense(baseDamage, target);
     double damage = ignoresDefense? baseDamage : mitigated;
     if (isCrit) damage += mitigated * CritBonusFraction;
-    damage = AfterResistance(damage, target, move.Element);
+    Suit element = move.Element == Suit.None ? attacker.Element : move.Element;
+    damage = AfterResistance(damage, target, element);
     return (int)Math.Round(Math.Max(1, damage));
   }
 }
