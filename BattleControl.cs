@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 public enum BattlePhase
 {
@@ -18,9 +19,6 @@ public class BattleControl
   public BattlePhase Phase {get;private set;} = BattlePhase.Declaration;
   public int RoundNumber {get;private set;}
   public int? WinningTeam {get;private set;}
-
-  public double CritChance {get;set;} = 0.15;
-  public double CritMultiplier {get;set;} = 1.5;
 
   public event Action<string> LogEmitted;
 
@@ -103,7 +101,7 @@ public class BattleControl
   {
     var targets = LivingEnemiesOf(actor).ToList();
     if (targets.Count == 0) return BattleAction.Skip(actor);
-    return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)]);
+    return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)], Move.BasicAttack);
   }
   
   //============================
@@ -178,6 +176,7 @@ public class BattleControl
   {
     var attacker = action.Actor;
     var target = action.Target;
+    var move = action.FigureMove;
 
     if (target == null || !target.IsAlive)
     {
@@ -185,19 +184,26 @@ public class BattleControl
       return;
     }
 
-    int damage = attacker.Atk;
-    bool crit = _rng.NextDouble() < CritChance;
-    if (crit) damage = (int)Math.Round(damage*CritMultiplier);
+    double hitChance = DamageCalculator.HitChance(move, target);
+    bool hit = _rng.NextDouble() < hitChance/100.0;
+    bool ignoresDefense = attacker.HasRider(Suit.Wands);
+    bool crit = _rng.NextDouble() < DamageCalculator.CritChance(move, target);
+    int damage = DamageCalculator.Resolve(attacker, target, move, crit, ignoresDefense);
+
+    Log($"{attacker.Name} uses {move.Name}.");
+    if(!hit){
+      Log("The attack missed");
+      return;
+    }
 
     int dealt = target.TakeDamage(damage);
     Log(crit
-      ? $"{attacker.Name} lands a critical hit on {target.Name} for {dealt}. ({target.CurrentHP}/{target.MaxHP})"
-      : $"{attacker.Name} hits {target.Name} for {dealt}. ({target.CurrentHP}/{target.MaxHP})");
-    
+        ? $"{attacker.Name} lands a critical hit on {target.Name} for {dealt}. ({target.CurrentHP}/{target.MaxHP})"
+        : $"{attacker.Name} hits {target.Name} for {dealt}. ({target.CurrentHP}/{target.MaxHP})");
+
     if (!target.IsAlive)
       Log($"{target.Name} is defeated.");
   }
-
   //============================
   // Phase 4 - End Conditions
   //============================

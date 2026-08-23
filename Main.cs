@@ -121,7 +121,7 @@ public partial class Main : Control
 		//Player Declares Attack and Target
 		var target = _battle.LivingEnemiesOf(_pendingPlayerUnit).FirstOrDefault();
 		if (target == null) return;
-		_battle.Declare(BattleAction.Attack(_pendingPlayerUnit, target));
+		_battle.Declare(BattleAction.Attack(_pendingPlayerUnit, target, Move.BasicAttack));
 
 		_pendingPlayerUnit = null;
 

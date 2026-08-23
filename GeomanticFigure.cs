@@ -7,6 +7,7 @@ public class GeomanticFigure
   public Quality MovementQuality {get;}
   public Suit RulingElement {get;}
   private const int BaseStat = 100;
+  private const double HpScale = 2.5;
   private const int SingleSourceSwing = 20;
   private const int DualSourceSwing = 10;
   public bool Fire {get;}
@@ -23,7 +24,7 @@ public class GeomanticFigure
     (Air ? "●" : "○") +
     (Water ? "●" : "○") +
     (Earth ? "●" : "○");
-  public int MaxHP => BaseStat + (Water ? DualSourceSwing : -DualSourceSwing) + (Earth ? DualSourceSwing : -DualSourceSwing);
+  public int MaxHP => (int)((BaseStat + (Water ? DualSourceSwing : -DualSourceSwing) + (Earth ? DualSourceSwing : -DualSourceSwing)) * HpScale);
   public int Atk => BaseStat + (Fire ? SingleSourceSwing : -SingleSourceSwing);
   public int Mag => BaseStat + (Air ? DualSourceSwing : -DualSourceSwing) + (Water ? DualSourceSwing : -DualSourceSwing);
   public int Def => BaseStat + (Earth ? SingleSourceSwing : -SingleSourceSwing);
