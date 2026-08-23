@@ -22,6 +22,13 @@ public class Move
     accuracy: 95,
     ScalingStat.Attack
   );
+  public static readonly Move Flame = new Move(
+    "Flame",
+    Suit.Wands,
+    power: 100,
+    accuracy: 95,
+    ScalingStat.Attack
+  );
 
   public override string ToString() => Name;
 }

@@ -38,13 +38,6 @@ public partial class Main : Control
 		_seedField.Visible = _debugToggle.ButtonPressed;
 
 		OnRestartPressed();
-
-		/**foreach (var (name, lines) in roster)
-		{
-			var f = new GeomanticFigure(name, lines, quality, suit);
-			GD.Print($"{f}  HP {f.MaxHP}  ATK {f.Atk}  MAG {f.Mag}  DEF {f.Def}  SPD {f.Spd}");	
-		}
-**/
 	}
 
 	private void StartBattle(int seed)
@@ -60,7 +53,7 @@ public partial class Main : Control
 		_seedLabel.Text = $"Seed: {seed}";
 		GD.Print($"=== New battle, seed: {seed} ===");
 
-		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player);
+		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player).AddResistance(Suit.Wands, 100);
 		AddFigure("Fortuna Minor", BattleControl.PlayerTeam, ControlSource.Player);
 		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI).Riders.Add(Suit.Wands);
 		AddFigure("Rubeus", BattleControl.EnemyTeam, ControlSource.AI);

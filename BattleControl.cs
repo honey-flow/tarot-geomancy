@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 
 public enum BattlePhase
 {
@@ -102,6 +101,7 @@ public class BattleControl
     var targets = LivingEnemiesOf(actor).ToList();
     if (targets.Count == 0) return BattleAction.Skip(actor);
     return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)], Move.BasicAttack);
+    //return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)], Move.Flame); //TEMP
   }
   
   //============================
