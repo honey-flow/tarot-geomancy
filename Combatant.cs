@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 public class Combatant
 {
@@ -9,27 +8,27 @@ public class Combatant
   public int MaxHP {get;}
   public int CurrentHP {get;private set;}
   public int BaseAtk {get;}
-  public int Atk => BaseAtk;
+  public int Atk => WithEssences(BaseAtk, StatKind.Atk);
   public int BaseMag {get;}
-  public int Mag => BaseMag;
+  public int Mag => WithEssences(BaseMag, StatKind.Mag);
   public int BaseDef {get;}
-  public int Def => BaseDef;
+  public int Def => WithEssences(BaseDef, StatKind.Def);
   public int BaseSpd {get;}
-  public int Spd  => BaseSpd;
+  public int Spd  => WithEssences(BaseSpd, StatKind.Spd);
   public int BaseEva {get;}
   public int Eva => BaseEva;
-  
-  public HashSet<Suit> Riders {get;} = new HashSet<Suit>();
-  public bool HasRider(Suit suit) => Riders.Contains(suit);
 
+  public EssenceDiamond Diamond {get;} = new EssenceDiamond();
+  private int WithEssences(int baseValue, StatKind kind) => (int)Math.Round(baseValue * (1 + Diamond.PercentFor(kind) / 100.0));
+  public bool HasRider(Suit suit) => Diamond.HasRider(suit);
+  public int ResistanceTo(Suit element) => Diamond.ResistanceFor(element);
+  
   public bool IsStunned {get;set;}
 
   public bool IsAlive => CurrentHP > 0;
   public bool CanAct => IsAlive && !IsStunned;
   public ControlSource Controller {get;set;} = ControlSource.AI;
   public Suit Element {get;set;} = Suit.None;
-
-  private readonly Dictionary<Suit, int> _resistance = new Dictionary<Suit, int>();
 
   public Combatant(int id, string name, int teamId, int maxHp, int atk, int mag, int def, int spd, int eva)
   {
@@ -59,17 +58,6 @@ public class Combatant
     int before = CurrentHP;
     CurrentHP = Math.Min(MaxHP, CurrentHP + amount);
     return CurrentHP - before;
-  }
-
-  public int ResistanceTo(Suit element)
-  {
-    _resistance.TryGetValue(element, out int value);
-    return value; 
-  }
-
-  public void AddResistance(Suit element, int amount)
-  {
-    _resistance[element] = ResistanceTo(element) + amount;
   }
 
   public override string ToString() => $"{Name} ({CurrentHP}/{MaxHP})";
