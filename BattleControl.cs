@@ -101,7 +101,6 @@ public class BattleControl
     var targets = LivingEnemiesOf(actor).ToList();
     if (targets.Count == 0) return BattleAction.Skip(actor);
     return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)], Move.BasicAttack);
-    //return BattleAction.Attack(actor, targets[_rng.Next(targets.Count)], Move.Flame); //TEMP
   }
   
   //============================
@@ -186,7 +185,8 @@ public class BattleControl
 
     double hitChance = DamageCalculator.HitChance(move, target);
     bool hit = _rng.NextDouble() < hitChance/100.0;
-    bool ignoresDefense = attacker.HasRider(Suit.Wands);
+    bool ignoresDefense = attacker.HasRider(Suit.Wands)
+                          && move.ScalesFrom == ScalingStat.Attack;
     bool crit = _rng.NextDouble() < DamageCalculator.CritChance(move, target);
     int damage = DamageCalculator.Resolve(attacker, target, move, crit, ignoresDefense);
 

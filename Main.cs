@@ -11,6 +11,9 @@ public partial class Main : Control
 	private LineEdit _seedField;
 	private Label _seedLabel;
 	private Label _battleStateLabel;
+	private LoadoutPanel _loadoutPanel;
+
+	private readonly PlayerInfo _player = new PlayerInfo();
 
 	private readonly Random _seedGenerator = new Random();
 
@@ -27,6 +30,7 @@ public partial class Main : Control
 		_debugToggle = GetNode<CheckBox>("DebugToggle");
 		_seedField = GetNode<LineEdit>("SeedField");
 		_seedLabel = GetNode<Label>("SeedLabel");
+		_loadoutPanel = GetNode<LoadoutPanel>("Loadout Panel");
 		_teamRows[BattleControl.PlayerTeam] = GetNode<VBoxContainer>("PlayerRows");
 		_teamRows[BattleControl.EnemyTeam] = GetNode<VBoxContainer>("EnemyRows");
 		_battleStateLabel = GetNode<Label>("BattleStateLabel");
@@ -35,9 +39,16 @@ public partial class Main : Control
 		_restartButton.Pressed += OnRestartPressed;
 		_debugToggle.Toggled += OnDebugToggled;
 
+		_player.UnlimitedEssences = true;
+
 		_seedField.Visible = _debugToggle.ButtonPressed;
 
 		OnRestartPressed();
+
+		DebugReports.Roster();
+		DebugReports.Deck();
+		DebugReports.Geometry();
+		DebugReports.DiamondBuild();
 	}
 
 	private void StartBattle(int seed)
@@ -53,16 +64,24 @@ public partial class Main : Control
 		_seedLabel.Text = $"Seed: {seed}";
 		GD.Print($"=== New battle, seed: {seed} ===");
 
-		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player).AddResistance(Suit.Wands, 100);
+		AddFigure("Populus", BattleControl.PlayerTeam, ControlSource.Player).Diamond.TryPlace(SlotPosition.North, EssenceCard.Get(Suit.Wands, CardRank.King));
 		AddFigure("Fortuna Minor", BattleControl.PlayerTeam, ControlSource.Player);
-		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI).Riders.Add(Suit.Wands);
+		AddFigure("Laetitia", BattleControl.EnemyTeam, ControlSource.AI).Diamond.TryPlace(SlotPosition.South, EssenceCard.Get(Suit.Wands, CardRank.King));
 		AddFigure("Rubeus", BattleControl.EnemyTeam, ControlSource.AI);
-
 
 		_battle.StartRound();
 		BuildCombatantRows();
 		RefreshUI();
 		RequestNextDeclaration();
+
+		_loadoutPanel.Open(_battle, _player, _debugToggle.ButtonPressed);
+
+		if (_debugToggle.ButtonPressed)
+		{
+			DebugReports.Diamonds(_battle);
+			DebugReports.Damage(_battle);
+			DebugReports.Accuracy(_battle);
+		}
 	}
 
 	private void BuildCombatantRows()
