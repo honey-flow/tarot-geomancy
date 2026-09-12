@@ -18,9 +18,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -29.0
+offset_left = 203.0
 offset_top = -15.5
-offset_right = 29.0
+offset_right = 261.0
 offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
@@ -28,9 +28,9 @@ text = "Attack"
 
 [node name="BattleStateLabel" type="Label" parent="." unique_id=81550248]
 layout_mode = 0
-offset_left = 555.0
+offset_left = 787.0
 offset_top = 266.0
-offset_right = 595.0
+offset_right = 827.0
 offset_bottom = 289.0
 horizontal_alignment = 1
 
@@ -39,9 +39,9 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -20.0
+offset_left = 212.0
 offset_top = 170.0
-offset_right = 20.0
+offset_right = 252.0
 offset_bottom = 210.0
 grow_horizontal = 2
 
@@ -52,9 +52,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
+offset_left = 212.0
 offset_top = 57.0
-offset_right = 20.0
+offset_right = 252.0
 offset_bottom = 97.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -70,28 +70,106 @@ text = "Restart"
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1745511317]
 layout_mode = 0
 offset_left = 92.0
-offset_top = 51.0
+offset_top = 20.0
 offset_right = 326.0
-offset_bottom = 232.0
+offset_bottom = 201.0
 
 [node name="DebugToggle" type="CheckBox" parent="." unique_id=1897607604]
 layout_mode = 0
 offset_left = 92.0
-offset_top = 51.0
+offset_top = 20.0
 offset_right = 326.0
-offset_bottom = 232.0
+offset_bottom = 201.0
 text = "Debug Mode"
 
 [node name="SeedField" type="LineEdit" parent="." unique_id=434153420]
 layout_mode = 0
 offset_left = 92.0
-offset_top = 163.0
+offset_top = 132.0
 offset_right = 326.0
-offset_bottom = 232.0
+offset_bottom = 201.0
 
 [node name="SeedLabel" type="Label" parent="." unique_id=420861057]
 layout_mode = 0
 offset_left = 145.0
-offset_top = 309.0
+offset_top = 53.0
 offset_right = 185.0
-offset_bottom = 332.0
+offset_bottom = 76.0
+
+[node name="Loadout Panel" type="Panel" parent="." unique_id=1019004664]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 232.0
+offset_right = 428.0
+offset_bottom = 632.0
+
+[node name="NorthSlot" type="Button" parent="Loadout Panel" unique_id=1214478682]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 25.0
+offset_right = -50.0
+offset_bottom = 75.0
+grow_horizontal = 2
+
+[node name="SouthSlot" type="Button" parent="Loadout Panel" unique_id=741507747]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -226.0
+offset_right = -50.0
+offset_bottom = -176.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="EastSlot" type="Button" parent="Loadout Panel" unique_id=2024166507]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -101.0
+offset_right = -175.0
+offset_bottom = -51.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="WestSlot" type="Button" parent="Loadout Panel" unique_id=795048067]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 25.0
+offset_top = -101.0
+offset_right = 75.0
+offset_bottom = -51.0
+grow_vertical = 2
+
+[node name="CardList" type="VBoxContainer" parent="Loadout Panel" unique_id=439311920]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 189.0
+offset_right = 400.0
+offset_bottom = 400.0
+
+[node name="FigureLabel" type="Label" parent="Loadout Panel" unique_id=1245777344]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 25.0
+offset_right = 340.0
+offset_bottom = 57.0
+
+[node name="FigureSelector" type="OptionButton" parent="Loadout Panel" unique_id=944046170]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 279.0
+offset_right = 212.0
+offset_bottom = 317.0
